@@ -20,6 +20,8 @@ from fastchat.model.model_adapter import (
     OPENAI_MODEL_LIST,
 )
 
+OPENAI_API_BASE = "https://api.chatanywhere.tech/v1/"
+
 # API setting constants
 API_MAX_RETRY = 16
 API_RETRY_SLEEP = 10
@@ -408,12 +410,15 @@ def chat_completion_openai(model, conv, temperature, max_tokens, api_dict=None):
     if api_dict is not None:
         openai.api_base = api_dict["api_base"]
         openai.api_key = api_dict["api_key"]
+    else:
+        openai.api_base = OPENAI_API_BASE
+        
     output = API_ERROR_OUTPUT
     for _ in range(API_MAX_RETRY):
         try:
             messages = conv.to_openai_api_messages()
             response = openai.ChatCompletion.create(
-                model=model,
+                model="gpt-4o-ca",
                 messages=messages,
                 n=1,
                 temperature=temperature,
@@ -700,6 +705,7 @@ def check_data(questions, model_answers, ref_answers, models, judges):
         for q in questions:
             if q["category"] not in NEED_REF_CATS:
                 continue
+            
             assert (
                 q["question_id"] in ref_answers[jg.model_name]
             ), f"Missing reference answer to Question {q['question_id']} for judge {jg.model_name}"
