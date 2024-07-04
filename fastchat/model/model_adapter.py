@@ -69,6 +69,7 @@ ANTHROPIC_MODEL_LIST = (
 
 OPENAI_MODEL_LIST = (
     "gpt-3.5-turbo",
+    "gpt-3.5-turbo-ca",
     "gpt-3.5-turbo-0301",
     "gpt-3.5-turbo-0613",
     "gpt-3.5-turbo-1106",
@@ -85,6 +86,8 @@ OPENAI_MODEL_LIST = (
     "im-also-a-good-gpt2-chatbot",
     "im-a-good-gpt2-chatbot",
     "gpt-4o-2024-05-13",
+    "gpt-4o-ca",
+    
 )
 
 
