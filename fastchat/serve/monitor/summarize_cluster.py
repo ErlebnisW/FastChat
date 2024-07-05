@@ -12,6 +12,7 @@ from fastchat.llm_judge.common import (
     chat_completion_openai,
     chat_completion_openai_azure,
     chat_completion_anthropic,
+    chat_completion_vllm,
 )
 from fastchat.conversation import get_conv_template
 
@@ -61,6 +62,9 @@ if __name__ == "__main__":
         elif "claude" in model:
             template_name = "claude"
             completion_func = chat_completion_anthropic
+        else:
+            template_name = "chatgpt"
+            completion_func = chat_completion_vllm
 
         conv = get_conv_template(template_name)
         conv.set_system_message(instruct)
