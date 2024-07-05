@@ -20,7 +20,14 @@ from fastchat.model.model_adapter import (
     OPENAI_MODEL_LIST,
 )
 
+# vllm settings
+VLLM_API_KEY = "Empty"
+VLLM_API_BASE = "http://localhost:8000/v1"
+CUSTOM_JUDGE = 'qwen2-72b'
+
+# OpenAI settings
 OPENAI_API_BASE = "https://api.chatanywhere.tech/v1/"
+OPENAI_JUDGE = 'gpt-4o-ca'
 
 # API setting constants
 API_MAX_RETRY = 16
@@ -405,6 +412,28 @@ def play_a_match_pair(match: MatchPair, output_file: str):
 
     return result
 
+def chat_completion_vllm(model, conv, temperature, max_tokens, api_dict=None):
+    openai.api_key = VLLM_API_KEY
+    openai.api_base = VLLM_API_BASE
+    
+    output = API_ERROR_OUTPUT
+    for _ in range(API_MAX_RETRY):
+        try:
+            messages = conv.to_openai_api_messages()
+            response = openai.ChatCompletion.create(
+                model=CUSTOM_JUDGE,
+                messages=messages,
+                n=1,
+                temperature=temperature,
+                max_tokens=max_tokens,
+            )
+            output = response["choices"][0]["message"]["content"]
+            break
+        except openai.error.OpenAIError as e:
+            print(type(e), e)
+            time.sleep(API_RETRY_SLEEP)
+
+    return output
 
 def chat_completion_openai(model, conv, temperature, max_tokens, api_dict=None):
     if api_dict is not None:
@@ -418,7 +447,7 @@ def chat_completion_openai(model, conv, temperature, max_tokens, api_dict=None):
         try:
             messages = conv.to_openai_api_messages()
             response = openai.ChatCompletion.create(
-                model="gpt-4o-ca",
+                model=OPENAI_JUDGE,
                 messages=messages,
                 n=1,
                 temperature=temperature,
