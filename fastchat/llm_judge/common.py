@@ -286,7 +286,8 @@ def run_judge_pair(question, answer_a, answer_b, judge, ref_answer, multi_turn=F
             model, conv, temperature=0, max_tokens=1024
         )
     else:
-        raise ValueError(f"Invalid judge model name: {model}")
+        conv.set_system_message(system_prompt)
+        judgment = chat_completion_vllm(model, conv, temperature=0, max_tokens=2048)
 
     if judge.prompt_template["output_format"] == "[[A]]":
         if "[[A]]" in judgment:
@@ -734,7 +735,6 @@ def check_data(questions, model_answers, ref_answers, models, judges):
         for q in questions:
             if q["category"] not in NEED_REF_CATS:
                 continue
-            
             assert (
                 q["question_id"] in ref_answers[jg.model_name]
             ), f"Missing reference answer to Question {q['question_id']} for judge {jg.model_name}"
